@@ -23,6 +23,11 @@ void close();
 #define TO_DEGREES (180/PI)
 #define TO_RADIANS (PI/180)
 
+#define ACCELERATE	state[SDL_SCANCODE_UP]
+#define BREAK		state[SDL_SCANCODE_DOWN]
+#define TURN_RIGHT	state[SDL_SCANCODE_RIGHT]
+#define TURN_LEFT	state[SDL_SCANCODE_LEFT]
+
 #define WIDTH 800
 #define HEIGHT 600
 #define CENTER_WIDTH (WIDTH/2)
@@ -31,11 +36,22 @@ void close();
 #define MAX_SCALE (sqrt(WIDTH*WIDTH+HEIGHT*HEIGHT)/HEIGHT)
 
 #define TICK_RATE 0.25
+#define SHIP_ACC 0.1
+#define SHIP_DEC 0.05
+#define SHIP_ROTATION_ACC 0.1
+#define SHIP_ROTATION_DEC 0.05
 
 // Global resources
 GfxObject ship, background;
 
 int backgroundRotation = 0;
+
+double shipX = CENTER_WIDTH;
+double shipY = CENTER_HEIGHT;
+double shipXSpeed = 0;
+double shipYSpeed = 0;
+double shipRotationSpeed = 0;
+double shipAngle = 90;
 
 int main( int argc, char* args[] ) {
 	// If you want the program to not launch the terminal, then go to
@@ -44,10 +60,13 @@ int main( int argc, char* args[] ) {
 	// Start up SDL and create window of width=800, height = 600
 	initRenderer(WIDTH, HEIGHT);
 	
+	// Obtain keyboard pointer
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
+	
 	// Create an object
 	ship = createGfxObject(  "../ship.png" );
-	ship.outputWidth  = 200;
-	ship.outputHeight = 200;
+	ship.outputWidth  = 100;
+	ship.outputHeight = 100;
 	
 	// Loading background resource
 	background = createGfxObject(  "../background.jpg" );
@@ -55,11 +74,11 @@ int main( int argc, char* args[] ) {
 	background.outputHeight = HEIGHT;
 	
 	// The real-time loop
-	while(true) {
+	while (true) {
 		// Handle events on the inqueue (e.g., mouse events)
 		SDL_Event e;  //Event handler
-		while( SDL_PollEvent( &e ) != 0 ) {
-			if( e.type == SDL_QUIT ) {   //User requests quit
+		while ( SDL_PollEvent( &e ) != 0 ) {
+			if ( e.type == SDL_QUIT ) {
 				close();
 				exit(0);
 			}
@@ -69,6 +88,19 @@ int main( int argc, char* args[] ) {
 		// Alpha is transparency: 0 = fully transparent, 0xFF = fully opaque. However, actual use of transparency requires further settings.
 		SDL_SetRenderDrawColor( gRenderer, 0x33, 0x33, 0x33, 0xFF );
 		SDL_RenderClear( gRenderer );
+		
+		// Register keyboard inputs
+		
+		// Ship calculations
+		shipRotationSpeed -= SHIP_ROTATION_ACC * (TURN_RIGHT - TURN_LEFT) + shipRotationSpeed/3 * SHIP_ROTATION_DEC;
+		
+		shipAngle = fmod(shipAngle + shipRotationSpeed, 360);
+		
+		shipXSpeed += SHIP_ACC * (ACCELERATE - BREAK) * cos(shipAngle * TO_RADIANS) - shipXSpeed/4 * SHIP_DEC;
+		shipYSpeed += SHIP_ACC * (ACCELERATE - BREAK) * sin(shipAngle * TO_RADIANS) - shipYSpeed/4 * SHIP_DEC;;
+		
+		shipX += shipXSpeed;
+		shipY -= shipYSpeed;
 		
 		// Calculations (such as rotation of background etc.)
 		backgroundRotation = (backgroundRotation+1) % (int) (360/TICK_RATE);
@@ -86,7 +118,7 @@ int main( int argc, char* args[] ) {
 		
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
 		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, scale);
-		renderGfxObject(&ship, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
+		renderGfxObject(&ship, shipX, shipY, 90 - shipAngle, 1.0f);
 		renderText("Hello World!", 300, 150);
 		
 		// This function updates the screen and also sleeps ~16 ms or so (based on the screen's refresh rate),
