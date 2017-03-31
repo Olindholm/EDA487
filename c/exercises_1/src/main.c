@@ -28,13 +28,16 @@ unsigned long long rotateRight(unsigned long long l, int n);
 unsigned long long rotateLeft(unsigned long long l, int n);
 void clearScreen();
 void printSpaces(int x);
+void printLinebreaks(int y);
 
 // Constant Variables
 #define WIDTH 6						// The width of window is 2^(WIDTH-1);
+#define HEIGHT 4					// -- || --
 
 #define MILLIS_SLEEP_PER_TICK 100	// Sleep (milliseconds) per tick
 #define TICKS_PER_SHIFT 4
-#define TICKS_PER_MOVE 2
+#define TICKS_PER_MOVE 2			// Good idea is to name these TICKS_PER_X_MOVE
+#define TICKS_PER_JUMP 3			// and TICKS_PER_Y_MOVE respectively
 
 /* 
  * Start of program!
@@ -73,10 +76,13 @@ int main(int argc, char **argv) {
 	 * 
 	 * Exercise_1_3h
 	 * Render the bit pattern left and right.
+	 * 
+	 * Exercise_1_3i
+	 * Render the bit pattern up and down.
 	 */
 	unsigned short a = 0b1000000000000000;
 	unsigned short b = 0b0000000000000001;
-	unsigned int x = 0;
+	unsigned int x = 0, y = 0;
 	
 	unsigned long currentTick = 0;
 	
@@ -91,13 +97,11 @@ int main(int argc, char **argv) {
 		}
 		
 		// Calculate position
-		// X-position
-		if (currentTick % TICKS_PER_MOVE == 0) {
-			x = (x+1) % (int) pow(2, WIDTH);
-		}
+		if (currentTick % TICKS_PER_MOVE == 0) x = (x+1) % (int) pow(2, WIDTH);
+		if (currentTick % TICKS_PER_JUMP == 0) y = (y+1) % (int) pow(2, HEIGHT);
 		
 		/* 
-		 * xSign is the first bit of the x position.
+		 * *Sign is the first bit of the x/y position.
 		 * It determines the direction we're moving,
 		 * similiarly how the first bit determines if
 		 * a number is negative or not in a signed number.
@@ -105,7 +109,11 @@ int main(int argc, char **argv) {
 		char xSign = x >> (WIDTH-1);
 		int widthOffset = pow(2, WIDTH) * xSign;
 		
+		char ySign = y >> (HEIGHT-1);
+		int heightOffset = pow(2, HEIGHT) * ySign;
+		
 		// Render
+		printLinebreaks(heightOffset + (y * (int) pow(-1, ySign)));
 		printSpaces(widthOffset + (x * (int) pow(-1, xSign)));
 		printShort(a | b);
 		
@@ -315,11 +323,25 @@ void clearScreen() {
 /* 
  * Prints a number of spaces into the console.
  * (good for offsets)
+ * (see printLinebreaks(..) )
  * 
  * @param x number of spaces to printed.
  */
 void printSpaces(int x) {
 	while (x-- > 0) {
 		printf(" ");
+	}
+}
+
+/* 
+ * Prints a number of linebreaks into the console.
+ * (good for offsets)
+ * (see printSpaces(..) )
+ * 
+ * @param y number of linebreaks to printed.
+ */
+void printLinebreaks(int y) {
+	while (y-- > 0) {
+		printf("\n");
 	}
 }
