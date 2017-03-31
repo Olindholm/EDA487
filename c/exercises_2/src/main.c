@@ -15,21 +15,34 @@
 #include <stdio.h>
 #include <math.h>
 
-GfxObject ship;
-
+// Function summary
 void close();
+
+// Constant Variables
+#define WIDTH 800
+#define HEIGHT 600
+#define CENTER_WIDTH (WIDTH/2)
+#define CENTER_HEIGHT (HEIGHT/2)
+
+// Global resources
+GfxObject ship, background;
 
 int main( int argc, char* args[] ) {
 	// If you want the program to not launch the terminal, then go to
 	// Project->Settings->General->"This program is a GUI application" and uncheck that flag.
 	
 	// Start up SDL and create window of width=800, height = 600
-	initRenderer(800, 600);
+	initRenderer(WIDTH, HEIGHT);
 	
 	// Create an object
 	ship = createGfxObject(  "../ship.png" );
 	ship.outputWidth  = 200;
 	ship.outputHeight = 200;
+	
+	// Loading background resource
+	background = createGfxObject(  "../background.jpg" );
+	background.outputWidth  = WIDTH;
+	background.outputHeight = HEIGHT;
 	
 	// The real-time loop
 	while(true) {
@@ -48,7 +61,8 @@ int main( int argc, char* args[] ) {
 		SDL_RenderClear( gRenderer );
 		
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
-		renderGfxObject(&ship, 400, 300, 0, 1.0f);
+		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
+		renderGfxObject(&ship, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
 		renderText("Hello World!", 300, 150);
 		
 		// This function updates the screen and also sleeps ~16 ms or so (based on the screen's refresh rate),
@@ -63,6 +77,7 @@ int main( int argc, char* args[] ) {
 void close() {
 	//Preferably, you should free all your GfxObjects, by calls to freeGfxObject(GfxObject* obj), but you don't have to.
 	freeGfxObject(&ship);
+	freeGfxObject(&background);
 	
 	closeRenderer(); //Free resources and close SDL
 }
