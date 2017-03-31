@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <math.h>
 
 // Function summary
 void printManyTimes(char str[], unsigned int n);
@@ -26,6 +27,14 @@ unsigned char binaryToDecimal(char str[]);
 unsigned long long rotateRight(unsigned long long l, int n);
 unsigned long long rotateLeft(unsigned long long l, int n);
 void clearScreen();
+void printSpaces(int x);
+
+// Constant Variables
+#define WIDTH 6						// The width of window is 2^(WIDTH-1);
+
+#define MILLIS_SLEEP_PER_TICK 100	// Sleep (milliseconds) per tick
+#define TICKS_PER_SHIFT 4
+#define TICKS_PER_MOVE 2
 
 /* 
  * Start of program!
@@ -61,23 +70,47 @@ int main(int argc, char **argv) {
 	/* 
 	 * Exercise_1_3f
 	 * Create a program rendering a bit pattern.
+	 * 
+	 * Exercise_1_3h
+	 * Render the bit pattern left and right.
 	 */
 	unsigned short a = 0b1000000000000000;
 	unsigned short b = 0b0000000000000001;
+	unsigned int x = 0;
+	
+	unsigned long currentTick = 0;
 	
 	// Run program forever
 	while (1) {
 		clearScreen();
 		
 		// Perform operations (such as patterns)
-		a = rotateRight(a, sizeof(a));
-		b = rotateLeft(b, sizeof(b));
+		if (currentTick % TICKS_PER_SHIFT == 0) {
+			a = rotateRight(a, sizeof(a));
+			b = rotateLeft(b, sizeof(b));
+		}
+		
+		// Calculate position
+		// X-position
+		if (currentTick % TICKS_PER_MOVE == 0) {
+			x = (x+1) % (int) pow(2, WIDTH);
+		}
+		
+		/* 
+		 * xSign is the first bit of the x position.
+		 * It determines the direction we're moving,
+		 * similiarly how the first bit determines if
+		 * a number is negative or not in a signed number.
+		 */
+		char xSign = x >> (WIDTH-1);
+		int widthOffset = pow(2, WIDTH) * xSign;
 		
 		// Render
+		printSpaces(widthOffset + (x * (int) pow(-1, xSign)));
 		printShort(a | b);
 		
 		// Wait
-		Sleep(400);
+		Sleep(MILLIS_SLEEP_PER_TICK);
 	}
 	 
 }
@@ -277,4 +310,16 @@ unsigned long long rotateLeft(unsigned long long l, int n) {
  */
 void clearScreen() {
 	system("@cls||clear");
+}
+
+/* 
+ * Prints a number of spaces into the console.
+ * (good for offsets)
+ * 
+ * @param x number of spaces to printed.
+ */
+void printSpaces(int x) {
+	while (x-- > 0) {
+		printf(" ");
+	}
 }
