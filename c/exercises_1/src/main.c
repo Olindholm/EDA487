@@ -21,6 +21,7 @@ void printByte(unsigned char b);
 void printBytes(unsigned long long l, int n);
 void printShort(unsigned short s);
 void printInt(unsigned int i);
+unsigned char binaryToDecimal(char str[]);
 
 /* 
  * Start of program!
@@ -43,10 +44,16 @@ int main(int argc, char **argv) {
 	 * Exercise_1_3a
 	 * Create a function printing a byte, short and int bitwise to the console.
 	 */
-	printByte(128);		printf("\n");
-	printShort(30345);	printf("\n");
-	printInt(65987);	printf("\n");
-	
+	//printByte(128);		printf("\n");
+	//printShort(30345);	printf("\n");
+	//printInt(65987);	printf("\n");
+	 
+	 /* 
+	 * Exercise_1_3b
+	 * Create a function printing a binary number as a decimal.
+	 */
+	 printf("%i", binaryToDecimal("10010001"));
+	 
 }
 
 /* 
@@ -148,4 +155,40 @@ void printShort(unsigned short s) {
  */
 void printInt(unsigned int i) {
 	printBytes(i, sizeof(i));
+}
+
+/* 
+ * Interprets a string as a byte and returns it.
+ * If the string provided is shorter or longer
+ * than a byte, zero will be returned.
+ * 
+ * Interprets the zero character a LOW bit
+ * and all others as a HIGH bit.
+ * 
+ * @param str the string of bits to be interpreted.
+ * 
+ * @return a byte equal to the bits of the string.
+ */
+unsigned char binaryToDecimal(char str[]) {
+	unsigned char byte = 0;
+	
+	// Confirms the length of the string.
+	if (strlen(str) == BYTE_LENGTH) {
+		
+		/* 
+		 * Interprets the character as LOW bit if
+		 * it's equal to zero, otherwise HIGH.
+		 * 
+		 * Performing an OR operation with the byte
+		 * after shifting all it's bits one step to
+		 * the left, garantueeing no overrides as well
+		 * as the right position for each bit after
+		 * full operation has compelted.
+		 */
+		for (int i = 0; i < BYTE_LENGTH; i++) {
+			byte = (byte << 1 | (str[i] != '0'));
+		}
+	}
+	
+	return byte;
 }
