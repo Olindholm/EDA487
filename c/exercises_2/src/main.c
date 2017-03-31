@@ -19,10 +19,16 @@
 void close();
 
 // Constant Variables
+#define PI 3.14
+#define TO_DEGREES (180/PI)
+#define TO_RADIANS (PI/180)
+
 #define WIDTH 800
 #define HEIGHT 600
 #define CENTER_WIDTH (WIDTH/2)
 #define CENTER_HEIGHT (HEIGHT/2)
+
+#define MAX_SCALE (sqrt(WIDTH*WIDTH+HEIGHT*HEIGHT)/HEIGHT)
 
 #define TICK_RATE 0.25
 
@@ -68,8 +74,18 @@ int main( int argc, char* args[] ) {
 		backgroundRotation = (backgroundRotation+1) % (int) (360/TICK_RATE);
 		int angle = backgroundRotation*TICK_RATE;
 		
+		/*
+		 * quadrant is either 0 or 1, whether we are in an even or odd quadrant
+		 * criticalAngle determines the angle at what MAX_SCALE occurs (in relation to the quadrant)
+		 * cosAngle is the angle between the background and the criticalAngle
+		 */
+		int quadrant = (angle % 180) / 90;
+		int criticalAngle = 180*quadrant + pow(-1, quadrant) * atan((float) WIDTH/HEIGHT) * TO_DEGREES;
+		int cosAngle = (angle % 180) - criticalAngle;
+		float scale = MAX_SCALE * cos(cosAngle * TO_RADIANS);
+		
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
-		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, 1.0f);
+		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, scale);
 		renderGfxObject(&ship, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
 		renderText("Hello World!", 300, 150);
 		
