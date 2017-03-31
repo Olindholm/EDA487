@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
 
 // Function summary
 void printManyTimes(char str[], unsigned int n);
@@ -22,6 +23,9 @@ void printBytes(unsigned long long l, int n);
 void printShort(unsigned short s);
 void printInt(unsigned int i);
 unsigned char binaryToDecimal(char str[]);
+unsigned long long rotateRight(unsigned long long l, int n);
+unsigned long long rotateLeft(unsigned long long l, int n);
+void clearScreen();
 
 /* 
  * Start of program!
@@ -40,7 +44,7 @@ int main(int argc, char **argv) {
 	 */
 	 //printBackwards("This text is pretty hard to read");
 	 
-	 /* 
+	/* 
 	 * Exercise_1_3a
 	 * Create a function printing a byte, short and int bitwise to the console.
 	 */
@@ -48,11 +52,33 @@ int main(int argc, char **argv) {
 	//printShort(30345);	printf("\n");
 	//printInt(65987);	printf("\n");
 	 
-	 /* 
+	/* 
 	 * Exercise_1_3b
 	 * Create a function printing a binary number as a decimal.
 	 */
-	 printf("%i", binaryToDecimal("10010001"));
+	 //printf("%i", binaryToDecimal("10010001"));
+	 
+	/* 
+	 * Exercise_1_3f
+	 * Create a program rendering a bit pattern.
+	 */
+	unsigned short a = 0b1000000000000000;
+	unsigned short b = 0b0000000000000001;
+	
+	// Run program forever
+	while (1) {
+		clearScreen();
+		
+		// Perform operations (such as patterns)
+		a = rotateRight(a, sizeof(a));
+		b = rotateLeft(b, sizeof(b));
+		
+		// Render
+		printShort(a | b);
+		
+		// Wait
+		Sleep(400);
+	}
 	 
 }
 
@@ -191,4 +217,64 @@ unsigned char binaryToDecimal(char str[]) {
 	}
 	
 	return byte;
+}
+
+/* 
+ * Rotates all bits to the right, given a size.
+ * 
+ * @param l the bits to be rotated.
+ * @param n the number of bytes to be rotated.
+ * 
+ * @return the bits (now rotated to the right)
+ */
+unsigned long long rotateRight(unsigned long long l, int n) {
+	/* 
+	 * Shifts the bits to the left, followed by
+	 * an OR operation with the bit that has
+	 * been shifted out (called carry).
+	 * 
+	 * The bit shifted out is calculated by
+	 * performing an AND operation on the bits
+	 * (before shifted), saving the carry only
+	 * if the carry position was HIGH.
+	 * 
+	 * Carry position would be the first or the
+	 * last bit, depending on the direction rotating.
+	 * (see rotateLeft(..) )
+	 */
+	return (l >> 1) | ((l & 1) << (n*8-1));
+}
+
+/* 
+ * Rotates all bits to the left, given a size.
+ * 
+ * @param l the bits to be rotated.
+ * @param n the number of bytes to be rotated.
+ * 
+ * @return the bits (now rotated to the left)
+ */
+unsigned long long rotateLeft(unsigned long long l, int n) {
+	/* 
+	 * Shifts the bits to the left, followed by
+	 * an OR operation with the bit that has
+	 * been shifted out (called carry).
+	 * 
+	 * The bit shifted out is calculated by
+	 * performing an AND operation on the bits
+	 * (before shifted), saving the carry only
+	 * if the carry position was HIGH.
+	 * 
+	 * Carry position would be the first or the
+	 * last bit, depending on the direction rotating.
+	 * (see rotateRight(..) )
+	 */
+	return (l << 1) | ((l & (1 << (n*8-1))) >> (n*8-1));
+}
+
+/* 
+ * Clears the console window.
+ * Seems only to work on Windows and Linux.
+ */
+void clearScreen() {
+	system("@cls||clear");
 }
