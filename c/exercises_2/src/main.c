@@ -24,8 +24,12 @@ void close();
 #define CENTER_WIDTH (WIDTH/2)
 #define CENTER_HEIGHT (HEIGHT/2)
 
+#define TICK_RATE 0.25
+
 // Global resources
 GfxObject ship, background;
+
+int backgroundRotation = 0;
 
 int main( int argc, char* args[] ) {
 	// If you want the program to not launch the terminal, then go to
@@ -60,8 +64,12 @@ int main( int argc, char* args[] ) {
 		SDL_SetRenderDrawColor( gRenderer, 0x33, 0x33, 0x33, 0xFF );
 		SDL_RenderClear( gRenderer );
 		
+		// Calculations (such as rotation of background etc.)
+		backgroundRotation = (backgroundRotation+1) % (int) (360/TICK_RATE);
+		int angle = backgroundRotation*TICK_RATE;
+		
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
-		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
+		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, 1.0f);
 		renderGfxObject(&ship, CENTER_WIDTH, CENTER_HEIGHT, 0, 1.0f);
 		renderText("Hello World!", 300, 150);
 		
