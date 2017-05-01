@@ -120,7 +120,11 @@ int main( int argc, char* args[] ) {
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
 		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, scale);
 		renderGfxObject(&ship, shipX, shipY, 90 - shipAngle, 1.0f);
-		renderText("Hello World!", 300, 150);
+		
+		// Rendering text
+		char str[] = "Hello World";
+		reverseString(str);
+		renderText(str, 0, 0);
 		
 		// This function updates the screen and also sleeps ~16 ms or so (based on the screen's refresh rate),
 		// because we used the flag SDL_RENDERER_PRESENTVSYNC in function initRenderer()
@@ -180,6 +184,18 @@ void shake(double *x, double *y) {
 	} else {
 		t = 1.5 * 2*PI * randChance(0.01);
 		angle = PI/180 * nextRandom(360) * (t != 0);
+	}
+}
+
+void reverseString(char s[]) {
+	int length = strlen(s);
+	
+	for (int i = 0; i < (length / 2); i++) {
+		char a = s[i];
+		char b = s[length - i - 1];
+		
+		s[i] = b;
+		s[length - i - 1] = a;
 	}
 }
 
