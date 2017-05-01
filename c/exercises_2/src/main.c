@@ -101,6 +101,7 @@ int main( int argc, char* args[] ) {
 		
 		shipX += shipXSpeed;
 		shipY -= shipYSpeed;
+		shake(&shipX, &shipY);
 		
 		// Calculations (such as rotation of background etc.)
 		backgroundRotation = (backgroundRotation+1) % (int) (360/TICK_RATE);
@@ -128,6 +129,58 @@ int main( int argc, char* args[] ) {
 	
 	close(); //Free allocated resources
 	return 0;
+}
+
+// Chance in percentage, for example 20%, it should be 0.2
+/**
+ * Rolls a random number anc checks whether it is within the chance range.
+ * 
+ * Example of usage, you want to check whether or not to trigger an effect.
+ * The effect has a 50% chance to trigger.
+ * randChance(0.5d);
+ * will return 0 if false, and 1 if true.
+ * 
+ * @param chance the chance of the method returning 1.
+ * @return returns 1 if the chance was granted, and 0 elsewise.
+ */
+int randChance(double chance) {
+	if (chance == 0) return 0;
+	return (fmod(rand(), (1.0d / chance)) == 0);
+}
+/**
+ * Generates and returns a random number betwenn 0 and max (max excluded)
+ * 
+ * @param max the maximum number to be generated.
+ * @return returns a random number between 0 and max (max excluded)
+ */
+int nextRandom(int max) {
+	return rand() % max;
+}
+
+int a = 2;
+double angle = 0;
+double t = 0;
+/**
+ * Moves the coordinates of the given object if the world is shaking.
+ * 
+ * @param x the pointer of the x coordinate of the object.
+ * @param y the pointer of the y coordinate of the object.
+ */
+void shake(double *x, double *y) {
+	if (t > 0) {
+		double le = a * cos(t/1.5d);
+		
+		*x += le * cos(angle);
+		*y += le * sin(angle);
+		
+		t--;
+		
+		
+		
+	} else {
+		t = 1.5 * 2*PI * randChance(0.01);
+		angle = PI/180 * nextRandom(360) * (t != 0);
+	}
 }
 
 void close() {
