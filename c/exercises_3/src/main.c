@@ -14,6 +14,7 @@
 #include "renderer.h"
 #include <stdio.h>
 #include <math.h>
+#include "vecmath.h"
 
 // Function summary
 void close();
