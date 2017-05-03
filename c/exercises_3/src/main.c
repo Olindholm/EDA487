@@ -47,12 +47,11 @@ GfxObject ship, background;
 
 int backgroundRotation = 0;
 
-double shipX = CENTER_WIDTH;
-double shipY = CENTER_HEIGHT;
-double shipXSpeed = 0;
-double shipYSpeed = 0;
-double shipRotationSpeed = 0;
-double shipAngle = 90;
+vec2f shipPosition = {CENTER_WIDTH, CENTER_HEIGHT};
+float shipXSpeed = 0;
+float shipYSpeed = 0;
+float shipRotationSpeed = 0;
+float shipAngle = 90;
 
 int main( int argc, char* args[] ) {
 	// If you want the program to not launch the terminal, then go to
@@ -100,9 +99,9 @@ int main( int argc, char* args[] ) {
 		shipXSpeed += SHIP_ACC * (ACCELERATE - BREAK) * cos(shipAngle * TO_RADIANS) - shipXSpeed/4 * SHIP_DEC;
 		shipYSpeed += SHIP_ACC * (ACCELERATE - BREAK) * sin(shipAngle * TO_RADIANS) - shipYSpeed/4 * SHIP_DEC;;
 		
-		shipX += shipXSpeed;
-		shipY -= shipYSpeed;
-		shake(&shipX, &shipY);
+		shipPosition.x += shipXSpeed;
+		shipPosition.y -= shipYSpeed;
+		shake(&shipPosition);
 		
 		// Calculations (such as rotation of background etc.)
 		backgroundRotation = (backgroundRotation+1) % (int) (360/TICK_RATE);
@@ -120,7 +119,7 @@ int main( int argc, char* args[] ) {
 		
 		// Render our object(s) - background objects first, and then forward objects (like a painter)
 		renderGfxObject(&background, CENTER_WIDTH, CENTER_HEIGHT, angle, scale);
-		renderGfxObject(&ship, shipX, shipY, 90 - shipAngle, 1.0f);
+		renderGfxObject(&ship, shipPosition.x, shipPosition.y, 90 - shipAngle, 1.0f);
 		
 		// Rendering text
 		char str[] = "Hello World";
@@ -171,12 +170,12 @@ double t = 0;
  * @param x the pointer of the x coordinate of the object.
  * @param y the pointer of the y coordinate of the object.
  */
-void shake(double *x, double *y) {
+void shake(vec2f *pos) {
 	if (t > 0) {
 		double le = a * cos(t/1.5d);
 		
-		*x += le * cos(angle);
-		*y += le * sin(angle);
+		pos->x += le * cos(angle);
+		pos->y += le * sin(angle);
 		
 		t--;
 		
