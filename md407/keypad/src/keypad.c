@@ -19,6 +19,9 @@
 /**
  * Inits a keypad at the given port and index.
  * 
+ * OBS! GPIO_D port with INDEX_LOW will not work properly.
+ * After extended debugging no reason was found.
+ * 
  * @param port the port which the keypad is to be initated on.
  * @param index the port which the index is to be initated on.
  * @return the keypad.
