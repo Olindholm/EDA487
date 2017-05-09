@@ -1,0 +1,39 @@
+/*
+ * Copyright 2017 (C) Osvald Lindholm
+ *
+ * This file is the result of the lab excercises provided
+ * for the Maskinorienterad programmering (EDA407)
+ * course at Chalmers. The lab exercises can be found at:
+ * http://www.cse.chalmers.se/edu/year/2017/course/EDA482_7/Documents/LabPM-MOP-2017-02-18.pdf
+ *
+ * This file is written for the MD407 lab computer
+ * using an ARM V6-m processor.
+ * Detailed specficiations can be found at:
+ * http://www.cse.chalmers.se/edu/resources/mop/documents/MD407_beskrivning.pdf
+ * http://www.cse.chalmers.se/edu/year/2017/course/EDA482_7/Documents/quickguide-mop.pdf
+ *
+ */
+ 
+#ifndef KEYPAD_H
+#define KEYPAD_H
+
+#include "gpio.h"
+#include "bool.h"
+
+typedef struct KEYPAD_STRUCT {
+	GPIO* port;
+	bool index; // low- (0) or high- (1) byte
+	void (*init) (struct KEYPAD_STRUCT*);
+	char (*scan) (struct KEYPAD_STRUCT*);
+} KEYPAD;
+
+KEYPAD keypad_create(GPIO* port, bool index);
+
+void keypad_init(KEYPAD* keypad);
+
+void keypad_enable_row(KEYPAD* keypad, int r);
+int keypad_detect_column(KEYPAD* keypad);
+
+char keypad_scan(KEYPAD* keypad);
+
+#endif
